@@ -1730,7 +1730,7 @@ MonoBehaviour:
   is_jumping: 0
   score: 0
   getHighScore: 0
-  asteroidsSO: {fileID: 11400000, guid: d7d25ab3a0695f547a990eed7a6c9934, type: 2}
+  asteroidsSO: {fileID: 11400000, guid: 2b6cec6ca77fe4d49968b9db06f6e657, type: 2}
   scoreBoard: {fileID: 1739818874}
   jumpsBoard: {fileID: 726793478}
   finalScoreBoard: {fileID: 636700101}
@@ -3307,7 +3307,7 @@ PrefabInstance:
     - target: {fileID: 149181557625862601, guid: cf05ab9f7ab75bc4eba390e4bb5be920,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 149181557625862603, guid: cf05ab9f7ab75bc4eba390e4bb5be920,
         type: 3}
@@ -3317,7 +3317,7 @@ PrefabInstance:
     - target: {fileID: 149181557625862607, guid: cf05ab9f7ab75bc4eba390e4bb5be920,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf05ab9f7ab75bc4eba390e4bb5be920, type: 3}

@@ -67,8 +67,8 @@ public class AchievementManager : MonoBehaviour
         Bullet.BULLET_FIRED_DELEGATE += AmountOfFiredBullets;
         Bullet.BULLET_HIT_ASTEROID_DELEGATE += FirstDust;
         Bullet.LUCKY_SHOT_DELEGATE += LuckyShot;
-        AsteraX.HIGH_SCORE_DELEGATE += RookiePilot;
-        AsteraX.HIGH_LEVEL_DELEGATE += SkillfullDodger;
+        GameManager.HIGH_SCORE_DELEGATE += RookiePilot;
+        GameManager.HIGH_LEVEL_DELEGATE += SkillfullDodger;
         anim = AchievemntPopUpDisplay.GetComponent<Animator>();
         if (anim == null) // if Animator is missing
             Debug.LogError("Animator component missing from this gameobject");
@@ -150,7 +150,7 @@ public class AchievementManager : MonoBehaviour
 
     void RookiePilot()
     {
-        if (AsteraX.S.score >= scoreToReachRookiePilot)
+        if (GameManager.score >= scoreToReachRookiePilot)
         {
             achievementsQueue.Enqueue(3);
             //UnlockAchievement(3);

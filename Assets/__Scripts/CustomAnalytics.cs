@@ -30,9 +30,9 @@ static public class CustomAnalytics
         AnalyticsEvent.GameOver(null, new Dictionary<string, object>
         {
             { "time", DateTime.Now },
-            { "score", AsteraX.S.score },
-            { "level", AsteraX.S.curLevel },
-            { "gotHighScore", AsteraX.S.getHighScore }
+            { "score", GameManager.score },
+            { "level", GameManager.curLevel },
+            { "gotHighScore", GameManager.getHighScore }
         });
     }
 

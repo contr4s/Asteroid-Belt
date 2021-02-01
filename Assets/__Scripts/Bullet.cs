@@ -8,9 +8,9 @@ public class Bullet : MonoBehaviour
 {
     static private Transform _BULLET_ANCHOR;
 
-    static public AsteraX.CallbackDelegate BULLET_FIRED_DELEGATE;
-    static public AsteraX.CallbackDelegate BULLET_HIT_ASTEROID_DELEGATE;
-    static public AsteraX.CallbackDelegate LUCKY_SHOT_DELEGATE;
+    static public GameManager.CallbackDelegate BULLET_FIRED_DELEGATE;
+    static public GameManager.CallbackDelegate BULLET_HIT_ASTEROID_DELEGATE;
+    static public GameManager.CallbackDelegate LUCKY_SHOT_DELEGATE;
 
     static Transform BULLET_ANCHOR
     {

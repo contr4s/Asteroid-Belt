@@ -6,17 +6,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class AsteraX : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     // Private Singleton-style instance. Accessed by static property S later in script
-    static private AsteraX _S;
+    static private GameManager _S;
 
     [SerializeField]
     static List<Asteroid> ASTEROIDS;
     static List<Bullet> BULLETS;
     static private eGameState _GAME_STATE = eGameState.mainMenu;
 
-    const float MIN_ASTEROID_DIST_FROM_PLAYER_SHIP = 5;
+    const float MIN_ASTEROID_DIST_FROM_PLAYER_SHIP = 5; //used for spawning asteroids
 
     public delegate void CallbackDelegate(); // Set up a generic delegate type.
     static public CallbackDelegate GAME_STATE_CHANGE_DELEGATE;
@@ -25,6 +25,17 @@ public class AsteraX : MonoBehaviour
     static public CallbackDelegate HIGH_SCORE_DELEGATE;
     static public CallbackDelegate HIGH_LEVEL_DELEGATE;
 
+    static public int jumps = 3;
+    static public bool is_jumping = false;
+
+    static public int score = 0;
+    static public bool getHighScore = false;
+
+    static public int curLevel = 0;
+
+    static public string[] levelsConfiguration;
+
+    static public bool isPaused = false;
     // System.Flags changes how eGameStates are viewed in the Inspector and lets multiple 
     //  values be selected simultaneously (similar to how Physics Layers are selected).
     // It's only valid for the game to ever be in one state, but I've added System.Flags
@@ -46,14 +57,6 @@ public class AsteraX : MonoBehaviour
         all = 0xFFFFFFF // 11111111111111111111111111111111
     }
 
-
-    public int jumps = 3;
-    [HideInInspector]
-    public bool is_jumping = false;
-    [HideInInspector]
-    public int score = 0;
-    public bool getHighScore = false;
-
     [Header("Set in Inspector")]
     [Tooltip("This sets the AsteroidsScriptableObject to be used throughout the game.")]
     public AsteroidsScriptableObject asteroidsSO;
@@ -64,26 +67,25 @@ public class AsteraX : MonoBehaviour
     public Text finalLevelBoard;
     public Text finalScreenTitle;
 
+    [SerializeField]
+    private string levelToRestart = "_Scene_0";
+    [SerializeField]
+    private float timeUntilRestart = 4f;
+
+    [SerializeField]
+    private float timeOfShowingPrelevelPanel = 2f;
+
     [Header("This will be set by Remote Settings")]
     public string levelProgression = "1:3/2,2:4/2,3:3/3,4:4/3,5:5/3,6:3/4,7:4/4,8:5/4,9:6/4,10:3/5";
-    public int curLevel = 0;
-    public string[] levelsConfiguration;
-
+    
     [Header("These reflect static fields and are otherwise unused")]
     [SerializeField]
     [Tooltip("This private field shows the game state in the Inspector and is set by the "
         + "GAME_STATE_CHANGE_DELEGATE whenever GAME_STATE changes.")]
-    protected eGameState _gameState;
-
-    private string levelToRestart = "_Scene_0";
-    public bool isPaused = false;
+    protected eGameState _gameState; 
     
     private void Awake()
     {
-#if DEBUG_AsteraX_LogMethods
-        Debug.Log("AsteraX:Awake()");
-#endif
-
         S = this;
 
         // This strange use of _gameState as an intermediary in the following lines 
@@ -96,10 +98,6 @@ public class AsteraX : MonoBehaviour
 
     void Start()
     {
-#if DEBUG_AsteraX_LogMethods
-        Debug.Log("AsteraX:Start()");
-#endif
-
         levelsConfiguration = levelProgression.Split(',');
 
         ASTEROIDS = new List<Asteroid>();
@@ -134,35 +132,35 @@ public class AsteraX : MonoBehaviour
     }
 
     public void StartLevel()
-    {
-        asteroidsSO.numSmallerAsteroidsToSpawn = levelsConfiguration[curLevel][4] - '0';
+    { 
+        asteroidsSO.numSmallerAsteroidsToSpawn = levelsConfiguration[curLevel][4] - '0'; //get this from remote settings
+
         // Spawn the parent Asteroids, child Asteroids are taken care of by them
         for (int i = 0; i < levelsConfiguration[curLevel][2] - '0'; i++)
         {
             SpawnParentAsteroid(i);
         }
-        curLevel++;
-        CustomAnalytics.SendLevelStart(curLevel);
+
+        curLevel++;       
         if (curLevel >= AchievementManager.levelToReachSkillfullDodger && !AchievementManager.S.Achievements[5].complete)
         {
             HIGH_LEVEL_DELEGATE();
         }
+        CustomAnalytics.SendLevelStart(curLevel);
     }
 
     void SpawnParentAsteroid(int i)
     {
-#if DEBUG_AsteraX_LogMethods
-        Debug.Log("AsteraX:SpawnParentAsteroid("+i+")");
-#endif
-
         Asteroid ast = Asteroid.SpawnAsteroid();
         ast.gameObject.name = "Asteroid_" + i.ToString("00");
+
         // Find a good location for the Asteroid to spawn
         Vector3 pos;
         do
         {
             pos = ScreenBounds.RANDOM_ON_SCREEN_LOC;
-        } while ((pos - PlayerShip.POSITION).magnitude < MIN_ASTEROID_DIST_FROM_PLAYER_SHIP);
+        } 
+        while ((pos - PlayerShip.POSITION).magnitude < MIN_ASTEROID_DIST_FROM_PLAYER_SHIP);
 
         ast.transform.position = pos;
         ast.size = asteroidsSO.initialSize;
@@ -183,41 +181,56 @@ public class AsteraX : MonoBehaviour
 
     IEnumerator DamagePlayer(GameObject player)
     {
-        player.SetActive(false);       
         Instantiate(player.GetComponent<PlayerShip>().disappearEffectPrefab, player.transform.position, Quaternion.identity);
+
+        Vector3 safePosition;
+
+        player.SetActive(false);               
         player.transform.position = new Vector3(10000, 10000, 0);
-        Vector3 safePosition = player.transform.position;
-        yield return new WaitForSeconds(player.GetComponent<PlayerShip>().jumpingTime * 0.8f);
+
+        yield return new WaitForSeconds(player.GetComponent<PlayerShip>().jumpingTime * 0.8f); 
+
         safePosition = player.GetComponent<PlayerShip>().FindSafePosition();
         player.transform.position = safePosition;
-        Instantiate(player.GetComponent<PlayerShip>().appearEffectPrefab, safePosition, Quaternion.identity);
+        //instantiate appear effect earlier than player appear
+        Instantiate(player.GetComponent<PlayerShip>().appearEffectPrefab, safePosition, Quaternion.identity); 
+
         yield return new WaitForSeconds(player.GetComponent<PlayerShip>().jumpingTime * 0.2f);
-        player.SetActive(true);
-        is_jumping = false;
+
+        player.SetActive(true); //player appear
+        is_jumping = false; //jump end
     }
 
     IEnumerator GameOver(GameObject player)
     {
         Destroy(player.GetComponent<PlayerShip>().shipExhaustEffectPrefab);
         Destroy(player);
+
         finalScoreBoard.text += score.ToString();
         finalLevelBoard.text += curLevel.ToString();
+
         if (getHighScore)
             finalScreenTitle.text = "New Highscore";
         else
             finalScreenTitle.text = "Game Over";
+
         GAME_STATE = eGameState.gameOver;
+
         SaveGameManager.CheckHighScore(score);
         SaveGameManager.Save();
+
         CustomAnalytics.SendFinalShipPartChoice();
         CustomAnalytics.SendGameOver();
-        yield return new WaitForSeconds(4f);
+
+        yield return new WaitForSeconds(timeUntilRestart);
+
         SceneManager.LoadScene(levelToRestart);
     }
 
     public IEnumerator NextLevel()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(timeOfShowingPrelevelPanel);
+
         GAME_STATE = eGameState.level; 
         StartLevel();
     }
@@ -232,7 +245,7 @@ public class AsteraX : MonoBehaviour
     /// a breakpoint in the set clause and then look at the call stack if you fear that 
     /// something random is setting your _S value.</para>
     /// </summary>
-    static public AsteraX S
+    static public GameManager S
     {
         get
         {
@@ -277,6 +290,7 @@ public class AsteraX : MonoBehaviour
             if (value != _GAME_STATE)
             {
                 _GAME_STATE = value;
+                GameManager.S._gameState = _GAME_STATE;
                 // Need to update all of the handlers
                 // Any time you use a delegate, you run the risk of it not having any handlers
                 //  assigned to it. In that case, it is null and will throw a null reference

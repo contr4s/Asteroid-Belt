@@ -35,9 +35,9 @@ public class Asteroid : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        AsteraX.AddAsteroid(this);
+        GameManager.AddAsteroid(this);
 
-        transform.localScale = Vector3.one * size * AsteraX.AsteroidsSO.asteroidScale;
+        transform.localScale = Vector3.one * size * GameManager.AsteroidsSO.asteroidScale;
         if (parentIsAsteroid)
         {
             InitAsteroidChild();
@@ -51,7 +51,7 @@ public class Asteroid : MonoBehaviour
         if (size > 1)
         {
             Asteroid ast;
-            for (int i = 0; i < AsteraX.AsteroidsSO.numSmallerAsteroidsToSpawn; i++)
+            for (int i = 0; i < GameManager.AsteroidsSO.numSmallerAsteroidsToSpawn; i++)
             {
                 ast = SpawnAsteroid();
                 ast.size = size - 1;
@@ -67,7 +67,7 @@ public class Asteroid : MonoBehaviour
 
     private void OnDestroy()
     {
-        AsteraX.RemoveAsteroid(this);
+        GameManager.RemoveAsteroid(this);
     }
 
     public void InitAsteroidParent()
@@ -130,10 +130,10 @@ public class Asteroid : MonoBehaviour
         }
 
         // Multiply the unit length of vel by the correct speed (randomized) for this size of Asteroid
-        vel = vel * Random.Range(AsteraX.AsteroidsSO.minVel, AsteraX.AsteroidsSO.maxVel) / (float)size;
+        vel = vel * Random.Range(GameManager.AsteroidsSO.minVel, GameManager.AsteroidsSO.maxVel) / (float)size;
         rigid.velocity = vel;
 
-        rigid.angularVelocity = Random.insideUnitSphere * AsteraX.AsteroidsSO.maxAngularVel;
+        rigid.angularVelocity = Random.insideUnitSphere * GameManager.AsteroidsSO.maxAngularVel;
     }
 
 #if DEBUG_Asteroid_ShotOffscreenDebugLines
@@ -192,16 +192,16 @@ public class Asteroid : MonoBehaviour
         {
             if (otherGO.tag == "Bullet")
             {               
-                AsteraX.S.score += AsteraX.AsteroidsSO.pointsForAsteroidSize[size];
-                if (AsteraX.S.score >= AchievementManager.scoreToReachRookiePilot && !AchievementManager.S.Achievements[3].complete)
+                GameManager.score += GameManager.AsteroidsSO.pointsForAsteroidSize[size];
+                if (GameManager.score >= AchievementManager.scoreToReachRookiePilot && !AchievementManager.S.Achievements[3].complete)
                 {
-                    AsteraX.HIGH_SCORE_DELEGATE();
+                    GameManager.HIGH_SCORE_DELEGATE();
                 }
 
-                if (!AsteraX.S.getHighScore && SaveGameManager.CheckHighScore(AsteraX.S.score))
+                if (!GameManager.getHighScore && SaveGameManager.CheckHighScore(GameManager.score))
                 {
-                    AsteraX.HIGH_SCORE_DELEGATE();
-                    AsteraX.S.getHighScore = true;
+                    GameManager.HIGH_SCORE_DELEGATE();
+                    GameManager.getHighScore = true;
                 }            
 
                 Bullet.BULLET_HIT_ASTEROID_DELEGATE();
@@ -227,7 +227,7 @@ public class Asteroid : MonoBehaviour
                 }
             }
             int index = Random.Range(0, 2);
-            GameObject go = AsteraX.AsteroidsSO.asteroidExplosionPrefabs[index];
+            GameObject go = GameManager.AsteroidsSO.asteroidExplosionPrefabs[index];
             go.transform.localScale = gameObject.transform.localScale;
             ParticleSystem particleSys = go.GetComponent<ParticleSystem>();
             ParticleSystem.MainModule main = particleSys.main;
@@ -270,7 +270,7 @@ public class Asteroid : MonoBehaviour
 
     static public Asteroid SpawnAsteroid()
     {
-        GameObject aGO = Instantiate<GameObject>(AsteraX.AsteroidsSO.GetAsteroidPrefab());
+        GameObject aGO = Instantiate<GameObject>(GameManager.AsteroidsSO.GetAsteroidPrefab());
         Asteroid ast = aGO.GetComponent<Asteroid>();
         return ast;
     }

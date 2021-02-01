@@ -16,15 +16,15 @@ public class PreLevel : MonoBehaviour
 
     void Update()
     {
-        if (AsteraX.GAME_STATE == AsteraX.eGameState.preLevel)
+        if (GameManager.GAME_STATE == GameManager.eGameState.preLevel)
             InitializePreLevel();
     }
 
     public void InitializePreLevel()
     {
-        levelDisplay.text = "LEVEL " + (AsteraX.S.curLevel + 1);
-        asteroidsDisplay.text = "Asteroids: " + (AsteraX.S.levelsConfiguration[AsteraX.S.curLevel][2] - '0');
-        childrenDisplay.text = "Children: " + (AsteraX.S.levelsConfiguration[AsteraX.S.curLevel][4] - '0');
-        StartCoroutine(AsteraX.S.NextLevel());
+        levelDisplay.text = "LEVEL " + (GameManager.curLevel + 1);
+        asteroidsDisplay.text = "Asteroids: " + (GameManager.levelsConfiguration[GameManager.curLevel][2] - '0');
+        childrenDisplay.text = "Children: " + (GameManager.levelsConfiguration[GameManager.curLevel][4] - '0');
+        StartCoroutine(GameManager.S.NextLevel());
     }
 }

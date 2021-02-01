@@ -56,9 +56,9 @@ public class MobileFireButton : MonoBehaviour
         if (registeredWithPauseChanged) return;
 
         // Remove any previous registration
-        AsteraX.PAUSED_CHANGE_DELEGATE -= PauseChangedCallback;
+        GameManager.PAUSED_CHANGE_DELEGATE -= PauseChangedCallback;
         // Register
-        AsteraX.PAUSED_CHANGE_DELEGATE += PauseChangedCallback;
+        GameManager.PAUSED_CHANGE_DELEGATE += PauseChangedCallback;
 
         registeredWithPauseChanged = true;
     }
@@ -68,6 +68,6 @@ public class MobileFireButton : MonoBehaviour
     void PauseChangedCallback()
     {
         // Enabling or disabling raycastTarget traps or ignores taps
-        img.raycastTarget = !AsteraX.S.isPaused;
+        img.raycastTarget = !GameManager.isPaused;
     }
 }

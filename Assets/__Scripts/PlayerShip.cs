@@ -66,7 +66,7 @@ public class PlayerShip : MonoBehaviour
         rigid.velocity = vel * shipSpeed;
 
         // Mouse input for firing
-        if (CrossPlatformInputManager.GetButtonDown("Fire1") && AsteraX.GAME_STATE == AsteraX.eGameState.level && !AsteraX.S.isPaused)
+        if (CrossPlatformInputManager.GetButtonDown("Fire1") && GameManager.GAME_STATE == GameManager.eGameState.level && !GameManager.isPaused)
         {
             Fire();
         }
@@ -75,10 +75,10 @@ public class PlayerShip : MonoBehaviour
 
     void OnCollisionEnter(Collision coll)
     {
-        if (coll.gameObject.tag == "asteroid" && !AsteraX.S.is_jumping)
+        if (coll.gameObject.tag == "asteroid" && !GameManager.is_jumping)
         {
-            AsteraX.S.is_jumping = true;
-            AsteraX.S.ApplyDamage(gameObject);
+            GameManager.is_jumping = true;
+            GameManager.S.ApplyDamage(gameObject);
         }
     }
 

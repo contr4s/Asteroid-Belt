@@ -6,7 +6,7 @@ public class MainMenuPanel : MonoBehaviour
 {
     public void PlayGame()
     {
-        AsteraX.GAME_STATE = AsteraX.eGameState.preLevel;
+        GameManager.GAME_STATE = GameManager.eGameState.preLevel;
     }
 
     public void DeleteSaveFile()
